@@ -1,10 +1,11 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class BoardManager : MonoBehaviour
 {
+    public List<BrickManager> bricks = new List<BrickManager>();
+
     public string[,] _board = new string[9, 9];
 
     [ContextMenu("Generate")]
@@ -18,11 +19,9 @@ public class BoardManager : MonoBehaviour
             }
         }
         SpawnMines();
-
-        PrintArr();
-
         CalculateMines();
 
+        SetupBricks();
         PrintArr();
     }
 
@@ -82,9 +81,17 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-
-
-
+    void SetupBricks()
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                int _index = (9 * i) + j;
+                bricks[_index].SetTileText(_board[i, j]);
+            }
+        }
+    }
 
     void PrintArr()
     {

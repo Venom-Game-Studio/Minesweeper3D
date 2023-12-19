@@ -47,4 +47,33 @@ public class EdtScript : MonoBehaviour
                 b._flagModel.gameObject.SetActive(true);
         }
     }
+
+
+    [ContextMenu("Solve")]
+    public void Solve()
+    {
+        foreach (BrickManager b in _gos)
+        {
+            if (string.Equals(b.GetTileText, "*"))
+            {
+                b._tileModel.gameObject.SetActive(true);
+                b._flagModel.gameObject.SetActive(true);
+            }
+
+            else
+            {
+                b._tileModel.gameObject.SetActive(false);
+                b._flagModel.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    [ContextMenu("Reset Tile Text")]
+    public void ResetTileText()
+    {
+        foreach (BrickManager b in _gos)
+        {
+            b.SetTileText("0");
+        }
+    }
 }
