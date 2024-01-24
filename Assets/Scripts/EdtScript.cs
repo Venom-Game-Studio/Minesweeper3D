@@ -56,14 +56,16 @@ public class EdtScript : MonoBehaviour
         {
             if (string.Equals(b.GetTileText, "*"))
             {
-                b._tileModel.gameObject.SetActive(true);
-                b._flagModel.gameObject.SetActive(true);
+                b._tileModel.gameObject.SetActive(false);
+                b._flagModel.gameObject.SetActive(false);
+                b._mineModel.gameObject.SetActive(true);
             }
 
             else
             {
                 b._tileModel.gameObject.SetActive(false);
                 b._flagModel.gameObject.SetActive(false);
+                b._mineModel.gameObject.SetActive(false);
             }
         }
     }
@@ -74,6 +76,7 @@ public class EdtScript : MonoBehaviour
         foreach (BrickManager b in _gos)
         {
             b.SetTileText("0");
+            b._mineModel.gameObject.SetActive(false);
         }
     }
 }
