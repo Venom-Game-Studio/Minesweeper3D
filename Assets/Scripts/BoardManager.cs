@@ -140,14 +140,12 @@ public class BoardManager : MonoBehaviour
         OpenEmptyMines();
     }
 
-
-    int rep = 0;
     [SerializeField] List<int> _tileToOpen = new List<int>();
 
     void CheckClickTile(int x, int y)
     {
         int _index = (9 * x) + y;
-        Debug.Log($"index : {_index} -> ({x},{y})...{rep}");
+        Debug.Log($"index : {_index} -> ({x},{y})");
         Debug.Log($"[{_board[x, y]}]");
 
         if (_tileToOpen.Contains(_index))
@@ -165,7 +163,11 @@ public class BoardManager : MonoBehaviour
             CheckTileLeft(x, y - 1);
             CheckTileRight(x, y + 1);
         }
-        rep++;
+        else
+        {
+            if (!_board[x, y].Equals("*"))
+                _tileToOpen.Add(_index);
+        }
     }
 
     void CheckTileUp(int x, int y)
@@ -176,7 +178,7 @@ public class BoardManager : MonoBehaviour
     }
     void CheckTileDown(int x, int y)
     {
-        if (x > 9) return;
+        if (x >= 9) return;
 
         CheckClickTile(x, y);
     }
@@ -188,7 +190,7 @@ public class BoardManager : MonoBehaviour
     }
     void CheckTileRight(int x, int y)
     {
-        if (y > 9) return;
+        if (y >= 9) return;
 
         CheckClickTile(x, y);
     }
