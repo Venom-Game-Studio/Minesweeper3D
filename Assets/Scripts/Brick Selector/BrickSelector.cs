@@ -15,15 +15,10 @@ public class BrickSelector : MonoBehaviour
 
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                //Debug.Log(hit.collider.gameObject.name);
-
-                //if (hit.collider.gameObject.TryGetComponent(out BrickManager entity))
                 if (hit.collider.CompareTag("MineTile"))
                 {
                     BrickManager _brickScript = hit.collider.GetComponentInParent<BrickManager>();
                     _brickScript.OpenTile();
-                    //Debug.Log(_brickScript.GetTileText);
-                    //Debug.Log(entity.GetTileText);
                 }
                 else
                 {

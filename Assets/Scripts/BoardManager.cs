@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
-using System.Reflection;
 
 public class BoardManager : MonoBehaviour
 {
@@ -134,8 +133,6 @@ public class BoardManager : MonoBehaviour
         _tileToOpen = new List<int>();
 
         CheckClickTile(x, y);
-        //CheckNativeTile(x, y, y);
-        //CheckNativeTileRev(x, y, y);
 
         OpenEmptyMines();
     }
@@ -170,6 +167,8 @@ public class BoardManager : MonoBehaviour
         }
     }
 
+
+
     void CheckTileUp(int x, int y)
     {
         if (x < 0) return;
@@ -195,174 +194,11 @@ public class BoardManager : MonoBehaviour
         CheckClickTile(x, y);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    void CheckNativeTile(int i, int j, int y)
-    {
-        int _index = 0;
-        try
-        {
-            _index = (9 * i) + j;
-            Debug.Log($"--> {i},{j} -> {_index}");
-            if (_index < _board.Length)
-            {
-                if (_board[i, j].Equals("0"))
-                {
-
-                    _tileToOpen.Add(_index);
-
-                    CheckNativeTile(i, j + 1, y);
-                }
-                else if (i + 1 < 9 && j + 1 < 9 && _board[i + 1, y].Equals("0"))
-                {
-                    j = y;
-                    Debug.Log(i + " " + j);
-                    CheckNativeTile(i + 1, j, y);
-                }
-
-                //CheckNativeTile(i + 1, j);
-                //AddBorderTileToOpen(i, j);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-        }
-
-    }
-
-    void CheckNativeTileRev(int i, int j, int y)
-    {
-        int _index = 0;
-        try
-        {
-            _index = (9 * i) + j;
-            Debug.Log($"--> {i},{j} -> {_index}");
-            if (_index < _board.Length)
-            {
-                if (i - 1 >= 0 && j - 1 >= 0 && _board[i, j].Equals("0"))
-                {
-                    _tileToOpen.Add(_index);
-
-                    CheckNativeTileRev(i, j - 1, y);
-                }
-                else if (i - 1 >= 0 && j - 1 >= 0 && _board[i - 1, y].Equals("0"))
-                {
-                    j = y;
-                    Debug.Log(i + " " + j);
-                    CheckNativeTileRev(i - 1, j, y);
-                }
-
-                //CheckNativeTile(i + 1, j);
-                //AddBorderTileToOpen(i, j);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-        }
-
-    }
-
-    void AddBorderTileToOpen(int i, int j)
-    {
-        int _index = (9 * i) + j;
-        _tileToOpen.Add(_index);
-    }
-
-
     void OpenEmptyMines()
     {
         foreach (int i in _tileToOpen)
             bricks[i]._tileModel.gameObject.SetActive(false);
     }
-
-
-
-
-
-    bool CheckNativeTiles(int i, int j)
-    {
-
-
-
-
-
-
-        Debug.LogWarning($"{_board.Length}");
-        Debug.LogWarning($"{_board[i, j] == null}");
-        Debug.LogWarning($"{_board[i, j + 1] == null}");
-
-        if (!IsConnected(_board[i, j], _board[i, j + 1])) return false;
-        Debug.LogWarning("A");
-        //down check from i,j
-        if (!IsConnected(_board[i, j], _board[i + 1, j])) return false;
-        Debug.LogWarning("B");
-        //up and left i+1, j+1
-        i += 1;
-        j += 1;
-
-        if (!IsConnected(_board[i, j], _board[i - 1, j])) return false;
-        Debug.LogWarning("C");
-        if (!IsConnected(_board[i, j], _board[i, j - 1])) return false;
-        Debug.LogWarning("D");
-
-        return true;
-    }
-
-    bool IsConnected(string dot1, string dot2)
-    {
-        return dot1.Contains(dot2);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
