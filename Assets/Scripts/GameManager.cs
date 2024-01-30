@@ -1,5 +1,7 @@
-using Fabwelt.Common.Enums;
 using UnityEngine;
+using Fabwelt.Common.Enums;
+using Fabwelt.Managers.Scriptable;
+using TMPro;
 
 namespace Fabwelt.Common
 {
@@ -7,7 +9,13 @@ namespace Fabwelt.Common
     {
         public static GameManager instance;
 
+        [SerializeField] TMP_Text versionText;
+
+        public LevelCatalog LevelCatalog;
+        public ColorScheme ColorScheme;
+
         public LevelDifficulty levelDifficulty;
+        public static Level SelectedLevel { get; set; }
 
         private void Awake()
         {
@@ -25,6 +33,8 @@ namespace Fabwelt.Common
             }
 
             DontDestroyOnLoad(gameObject);
+
+            versionText.text = Application.version;
         }
     }
 }
