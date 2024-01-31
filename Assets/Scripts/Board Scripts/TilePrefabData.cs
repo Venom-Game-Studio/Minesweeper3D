@@ -42,6 +42,7 @@ public class TilePrefabData : MonoBehaviour
             return;
         }
 
+        //Debug.LogWarning(_tileText.text);
         BoardManager.instance.RevealEmptyMines(this);
     }
 

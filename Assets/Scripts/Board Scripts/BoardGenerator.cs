@@ -1,17 +1,23 @@
 using UnityEngine;
 using Fabwelt.Common;
 using System.Collections.Generic;
-using Fabwelt.Managers.Scriptable;
 
 namespace Fabwelt.Managers.Board
 {
     public class BoardGenerator : MonoBehaviour
     {
+        public static BoardGenerator instance;
+
         [SerializeField] TilePrefabData _tilePrefab;
 
-        public static List<TilePrefabData> bricks = new List<TilePrefabData>();
+        public List<TilePrefabData> bricks = new List<TilePrefabData>();
 
         List<Vector2Int> _coordinates = new List<Vector2Int>();
+
+        private void Awake()
+        {
+            instance = this;
+        }
 
         private void Start()
         {

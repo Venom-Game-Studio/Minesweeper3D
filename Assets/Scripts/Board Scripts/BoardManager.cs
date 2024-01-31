@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Linq;
 using Fabwelt.Common;
 using Fabwelt.Managers.Board;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ public class BoardManager : MonoBehaviour
 {
     public static BoardManager instance;
     public string[,] _board;
-    [SerializeField] List<string> _mines = new List<string>();
+    [SerializeField] List<Vector2Int> _mines = new List<Vector2Int>();
 
     readonly string _emptySpace = string.Empty;
 
@@ -38,8 +39,7 @@ public class BoardManager : MonoBehaviour
 
     void SpawnMines()
     {
-
-        int _mines = 0;
+        int _totalMines = 0;
         do
         {
             (int x, int y) = GetRandomPosition();
@@ -47,10 +47,12 @@ public class BoardManager : MonoBehaviour
             if (string.Equals(_board[x, y], _emptySpace))
             {
                 _board[x, y] = "*";
-                this._mines.Add(string.Format("{0},{1}", x, y));
-                _mines++;
+                _mines.Add(new Vector2Int(x, y));
+                _totalMines++;
             }
-        } while (_mines < GameManager.SelectedLevel.mineCount);
+        } while (_totalMines < GameManager.SelectedLevel.mineCount);
+
+        _mines = _mines.OrderBy(x => x.x).ThenBy(x => x.y).ToList();
     }
 
     void CalculateMines()
@@ -95,7 +97,7 @@ public class BoardManager : MonoBehaviour
             for (int j = 0; j < SizeY; j++)
             {
                 int _index = (SizeY * i) + j;
-                BoardGenerator.bricks[_index].SetTileText(_board[i, j]);
+                BoardGenerator.instance.bricks[_index].SetTileText(_board[i, j]);
             }
         }
     }
@@ -141,22 +143,20 @@ public class BoardManager : MonoBehaviour
     {
         for (int i = 0; i < _mines.Count; i++)
         {
-            (int x, int y) = GetPosition(i);
+            int _index = (SizeY * _mines[i].x) + _mines[i].y;
 
-            int _index = (SizeY * x) + y;
-
-            if (BoardGenerator.bricks[_index].isFlaged) continue;
-            BoardGenerator.bricks[_index]._tileModel.gameObject.SetActive(false);
+            if (BoardGenerator.instance.bricks[_index].isFlaged) continue;
+            BoardGenerator.instance.bricks[_index]._tileModel.gameObject.SetActive(false);
         }
     }
 
     public void RevealEmptyMines(TilePrefabData _brick)
     {
-        int _brickIndex = BoardGenerator.bricks.FindIndex((x) => x == _brick);
+        int _brickIndex = BoardGenerator.instance.bricks.FindIndex((x) => x == _brick);
 
         (int x, int y) = GetPositionFromIndex(_brickIndex);
 
-        Debug.Log(string.Format("{0},{1}", x, y));
+        //Debug.Log(string.Format("{0},{1}", x, y));
 
         _tileToOpen = new List<int>();
 
@@ -169,13 +169,12 @@ public class BoardManager : MonoBehaviour
 
     void CheckClickTile(int x, int y)
     {
-        int _index = (SizeX * x) + y;
-        Debug.Log($"index : {_index} -> ({x},{y})");
-        Debug.Log($"[{_board[x, y]}]");
+        int _index = (SizeY * x) + y;
+        //Debug.Log($"index : {_index} -> ({x},{y}) [{_board[x, y]}]");
 
         if (_tileToOpen.Contains(_index))
         {
-            Debug.Log($"{_index} already exist!!!");
+            //Debug.LogWarning($"{_index} already exist!!!");
             return;
         }
 
@@ -224,8 +223,8 @@ public class BoardManager : MonoBehaviour
     {
         foreach (int i in _tileToOpen)
         {
-            if (BoardGenerator.bricks[i].isFlaged) continue;
-            BoardGenerator.bricks[i]._tileModel.gameObject.SetActive(false);
+            if (BoardGenerator.instance.bricks[i].isFlaged) continue;
+            BoardGenerator.instance.bricks[i]._tileModel.gameObject.SetActive(false);
         }
     }
 
@@ -249,16 +248,9 @@ public class BoardManager : MonoBehaviour
         return (x, y);
     }
 
-    (int, int) GetPosition(int i)
-    {
-        int x = int.Parse((_mines[i].Split(','))[0]);
-        int y = int.Parse((_mines[i].Split(','))[1]);
-        return (x, y);
-    }
-
     (int, int) GetPositionFromIndex(int _brickIndex)
     {
-        int x = _brickIndex / SizeX;
+        int x = _brickIndex / SizeY;
         int y = _brickIndex % SizeY;
         return (x, y);
     }

@@ -17,6 +17,8 @@ public class TileSelector : MonoBehaviour
             {
                 if (hit.collider.CompareTag("MineTile"))
                 {
+                    //Debug.LogWarning(hit.collider.transform.parent.name);
+
                     TilePrefabData _brickScript = hit.collider.GetComponentInParent<TilePrefabData>();
                     _brickScript.OpenTile();
                 }
