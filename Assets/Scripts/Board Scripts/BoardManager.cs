@@ -1,7 +1,9 @@
 using System;
+using Fabwelt.UI;
 using UnityEngine;
 using System.Linq;
 using Fabwelt.Common;
+using Fabwelt.Common.Enums;
 using Fabwelt.Managers.Board;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
@@ -9,17 +11,40 @@ using UnityEngine.SceneManagement;
 public class BoardManager : MonoBehaviour
 {
     public static BoardManager instance;
-    public string[,] _board;
-    [SerializeField] List<Vector2Int> _mines = new List<Vector2Int>();
 
+    [SerializeField] internal List<TilePrefabData> flagedTiles = new List<TilePrefabData>();
+
+    string[,] _board;
+    List<int> _tileToOpen = new List<int>();
+    List<Vector2Int> _mineMatrix = new List<Vector2Int>();
     readonly string _emptySpace = string.Empty;
 
     int SizeX { get { return GameManager.SelectedLevel.size.x; } }
     int SizeY { get { return GameManager.SelectedLevel.size.y; } }
 
+    public static event Action<TilePrefabData, GameState> OpenTileEvent = delegate { };
+
     private void Awake()
     {
         instance = this;
+    }
+
+    private void OnEnable()
+    {
+        GameManager.TileFlagUpdate += _data =>
+        {
+            if (flagedTiles.Exists(x => x == _data))
+                flagedTiles.Remove(_data);
+            else
+                flagedTiles.Add(_data);
+
+            GameUiManager.Instance.UpdateFlageCount(GameManager.SelectedLevel.mineCount - flagedTiles.Count);
+        };
+    }
+
+    private void OnDisable()
+    {
+        GameManager.TileFlagUpdate -= _data => { };
     }
 
     public void GenerateBoard()
@@ -47,12 +72,12 @@ public class BoardManager : MonoBehaviour
             if (string.Equals(_board[x, y], _emptySpace))
             {
                 _board[x, y] = "*";
-                _mines.Add(new Vector2Int(x, y));
+                _mineMatrix.Add(new Vector2Int(x, y));
                 _totalMines++;
             }
         } while (_totalMines < GameManager.SelectedLevel.mineCount);
 
-        _mines = _mines.OrderBy(x => x.x).ThenBy(x => x.y).ToList();
+        _mineMatrix = _mineMatrix.OrderBy(x => x.x).ThenBy(x => x.y).ToList();
     }
 
     void CalculateMines()
@@ -137,17 +162,12 @@ public class BoardManager : MonoBehaviour
 
 
 
-
     [ContextMenu("RevealMines")]
     public void RevealMines()
     {
-        for (int i = 0; i < _mines.Count; i++)
-        {
-            int _index = (SizeY * _mines[i].x) + _mines[i].y;
+        GameManager.GameState = GameState.End;
 
-            if (BoardGenerator.instance.bricks[_index].isFlaged) continue;
-            BoardGenerator.instance.bricks[_index]._tileModel.gameObject.SetActive(false);
-        }
+        OpenTileEvent(null, GameManager.GameState);
     }
 
     public void RevealEmptyMines(TilePrefabData _brick)
@@ -165,7 +185,6 @@ public class BoardManager : MonoBehaviour
         OpenEmptyTiles();
     }
 
-    [SerializeField] List<int> _tileToOpen = new List<int>();
 
     void CheckClickTile(int x, int y)
     {
@@ -173,10 +192,7 @@ public class BoardManager : MonoBehaviour
         //Debug.Log($"index : {_index} -> ({x},{y}) [{_board[x, y]}]");
 
         if (_tileToOpen.Contains(_index))
-        {
-            //Debug.LogWarning($"{_index} already exist!!!");
             return;
-        }
 
         if (_board[x, y].Equals(_emptySpace))
         {
@@ -222,10 +238,7 @@ public class BoardManager : MonoBehaviour
     void OpenEmptyTiles()
     {
         foreach (int i in _tileToOpen)
-        {
-            if (BoardGenerator.instance.bricks[i].isFlaged) continue;
-            BoardGenerator.instance.bricks[i]._tileModel.gameObject.SetActive(false);
-        }
+            OpenTileEvent(BoardGenerator.instance.bricks[i], GameManager.GameState);
     }
 
 

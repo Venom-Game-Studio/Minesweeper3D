@@ -16,6 +16,9 @@ namespace Fabwelt.UI
 
         private void Start()
         {
+            GameManager.isGameOver = false;
+            GameManager.GameState = GameState.none;
+
             List<string> list = new List<string>(Enum.GetNames(typeof(LevelDifficulty)));
 
             difficultyDropdown.ClearOptions();

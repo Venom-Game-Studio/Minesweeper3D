@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class EdtScript : MonoBehaviour
 {
-    public List<TilePrefabData> _gos = new List<TilePrefabData>();
+    /*public List<TilePrefabData> _gos = new List<TilePrefabData>();
 
     [ContextMenu("Rot")]
     public void RotTiles()
@@ -78,5 +78,5 @@ public class EdtScript : MonoBehaviour
             b.SetTileText("0");
             b._mineModel.gameObject.SetActive(false);
         }
-    }
+    }*/
 }

@@ -1,6 +1,8 @@
 using UnityEngine;
 using Fabwelt.Common;
+using Fabwelt.Common.Enums;
 using System.Collections.Generic;
+using Fabwelt.Managers.Scriptable;
 
 namespace Fabwelt.Managers.Board
 {
@@ -9,26 +11,26 @@ namespace Fabwelt.Managers.Board
         public static BoardGenerator instance;
 
         [SerializeField] TilePrefabData _tilePrefab;
+        [SerializeField] Transform _tileParent;
 
-        public List<TilePrefabData> bricks = new List<TilePrefabData>();
+        internal List<TilePrefabData> bricks = new List<TilePrefabData>();
 
         List<Vector2Int> _coordinates = new List<Vector2Int>();
 
         private void Awake()
         {
             instance = this;
+
+            GameManager.SelectedLevel = GameManager.instance.LevelCatalog.Levels.Find(x => x.LevelDifficulty == GameManager.instance.levelDifficulty);
         }
 
         private void Start()
         {
-            GameManager.SelectedLevel = GameManager.instance.LevelCatalog.Levels.Find(x => x.LevelDifficulty == GameManager.instance.levelDifficulty);
-
             Camera.main.orthographicSize = GameManager.SelectedLevel.cameraZoom;
 
             Generate();
         }
 
-        [ContextMenu("Generate Board")]
         public void Generate()
         {
             SpawnTiles();
@@ -44,7 +46,11 @@ namespace Fabwelt.Managers.Board
 
         void RemoveOldTiles()
         {
-            foreach (Transform t in this.transform) Destroy(t.gameObject);
+#if UNITY_EDITOR
+            foreach (Transform t in _tileParent) DestroyImmediate(t.gameObject);
+#else
+            foreach (Transform t in _tileParent) Destroy(t.gameObject);
+#endif
         }
 
         void GenerateCoordinates(int x, int y)
@@ -61,12 +67,33 @@ namespace Fabwelt.Managers.Board
             int i = 1;
             foreach (Vector2Int co in _coordinates)
             {
-                TilePrefabData _go = Instantiate(_tilePrefab, new Vector3(co.x, this.transform.position.y, co.y), Quaternion.identity, this.transform);
+                TilePrefabData _go = Instantiate(_tilePrefab, new Vector3(co.x, _tileParent.position.y, co.y), Quaternion.identity, _tileParent);
                 _go.name = $"Tile_{i}";
                 i++;
 
                 bricks.Add(_go);
             }
         }
+
+
+
+
+
+
+#if UNITY_EDITOR
+        [Space(20f), Header("For Editor Only")]
+        [SerializeField] LevelDifficulty levelDifficulty;
+        [SerializeField] LevelCatalog LevelCatalog;
+
+        [ContextMenu("Generate Board")]
+        void Gen()
+        {
+            GameManager.SelectedLevel = LevelCatalog.Levels.Find(x => x.LevelDifficulty == levelDifficulty);
+
+            Camera.main.orthographicSize = GameManager.SelectedLevel.cameraZoom;
+
+            SpawnTiles();
+        }
+#endif
     }
 }

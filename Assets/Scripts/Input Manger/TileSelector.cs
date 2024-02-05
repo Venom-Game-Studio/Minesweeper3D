@@ -1,48 +1,56 @@
 using UnityEngine;
 
-public class TileSelector : MonoBehaviour
+namespace Fabwelt.Common
 {
-    void Update()
+    public class TileSelector : MonoBehaviour
     {
-        GetInput();
-    }
-
-    private void GetInput()
-    {
-        if (Input.GetMouseButtonDown(0))
+        void Update()
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (GameManager.isGameOver) return;
 
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                if (hit.collider.CompareTag("MineTile"))
-                {
-                    //Debug.LogWarning(hit.collider.transform.parent.name);
-
-                    TilePrefabData _brickScript = hit.collider.GetComponentInParent<TilePrefabData>();
-                    _brickScript.OpenTile();
-                }
-                else
-                {
-                    Debug.LogError(hit.collider.gameObject.name);
-                }
-            }
+            GetInput();
         }
 
-        if (Input.GetMouseButtonDown(1))
+        private void GetInput()
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (Input.GetMouseButtonDown(0))
             {
-                if (hit.collider.CompareTag("MineTile"))
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray, out RaycastHit hit))
                 {
-                    TilePrefabData _brickScript = hit.collider.GetComponentInParent<TilePrefabData>();
-                    _brickScript.PlaceFlag();
+                    if (hit.collider.CompareTag("MineTile"))
+                    {
+                        if (GameManager.GameState != Enums.GameState.Start)
+                            GameManager.GameState = Enums.GameState.Start;
+
+                        TilePrefabData _brickScript = hit.collider.GetComponentInParent<TilePrefabData>();
+                        _brickScript.OpenTile();
+                    }
+                    else
+                    {
+                        Debug.LogError(hit.collider.gameObject.name);
+                    }
                 }
-                else
+            }
+
+            if (GameManager.GameState != Enums.GameState.Start) return;
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray, out RaycastHit hit))
                 {
-                    Debug.LogError(hit.collider.gameObject.name);
+                    if (hit.collider.CompareTag("MineTile"))
+                    {
+                        TilePrefabData _brickScript = hit.collider.GetComponentInParent<TilePrefabData>();
+                        _brickScript.PlaceFlag();
+                    }
+                    else
+                    {
+                        Debug.LogError(hit.collider.gameObject.name);
+                    }
                 }
             }
         }
